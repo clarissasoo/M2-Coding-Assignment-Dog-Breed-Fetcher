@@ -4,6 +4,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -43,13 +44,18 @@ public class DogApiBreedFetcher implements BreedFetcher {
 
             JSONArray subBreedsJson = json.getJSONArray("message");
             List<String> subBreeds = new ArrayList<>();
-            for (int i = 0; i < subBreedsJson.length(); i++) {
-                subBreeds.add(subBreedsJson.getString(i));
+
+            if (subBreedsJson != null) {
+                for (int i = 0; i < subBreedsJson.length(); i++) {
+                    subBreeds.add(subBreedsJson.getString(i));
+                }
             }
 
             return subBreeds;
-        } catch (IOException | RuntimeException e) {
+        } catch (IOException e) {
             throw new BreedNotFoundException("Failed to fetch sub-breeds for breed: " + breed);
+        } catch (JSONException e) {
+            throw new BreedNotFoundException("Invalid API response for breed: " + breed);
         }
     }
 }
